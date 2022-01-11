@@ -1,28 +1,40 @@
-<p align='center'>
-  <h3 align="center">fb-last-post-from-feed</h3>
-  <p align="center">GitHub Action for posting to a facebook page the latest entry from an atom feed</p>
-</p>
-
----
-
-Current version: 0.1.0
+#facebook-post-action
+Github Action for posting to a facebook page or group.
 
 ## 🎒 Prep Work
 1. Get a facebook permanent access token (explained below) using a facebook account that owns the page where you want to post messages.
 2. Find the ID of the page that you want to post messages in (explained below).
 3. Find the atom feed URL that contains the posts that you wish to share.
 
-## 🖥 Project Setup
-1. Fork this repo.
-2. Go to your fork's `Settings` > `Secrets` > `Add a new secret` for each environment secret (below).
-3. Activate github workflows on `Actions` > `I understand my workflows, go ahead and run them`.
-4. Star your own fork to trigger the initial build. The feed is checked hourly, if you haven't posted anything on your blog on the last hour, nothing will be posted on the initial build.
+## 🖥 Workflow example
+```yaml
+name: Facebook Post Action
+
+on:
+  release:
+    types: [published]
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: facebook-post-action
+        uses: ReenigneArcher/facebook-post-action@v1
+        with:
+          page_id: ${{ secrets.FACEBOOK_PAGE_ID }}
+          access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          message: |
+            ${{ github.event.repository.name }} ${{ github.ref }} Released
+
+            ${{ github.event.release.body }}
+          url: ${{ github.event.release.html_url }}
+```
 
 ## 🤫 Environment Secrets
 
 - **FACEBOOK_PAGE_ID**: The page ID where you want to post
 - **FACEBOOK_ACCESS_TOKEN**: The permanent facebook access token
-- **FEED_URL**: Atom feed URL
+- **POST_CONTENT**: The content to post
 
 ## 👥 How to get a Facebook permanent access token
 
@@ -69,7 +81,7 @@ The response should look like this:
 
 ### 3. Get User ID ###
 
-Using the long-lived access token, make a GET request to 
+Using the long-lived access token, make a GET request to
 
 > https://graph.facebook.com/me?access_token=**{long_lived_access_token}**
 
