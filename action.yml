@@ -1,12 +1,28 @@
-name: fb-last-post-from-feed
-author: Luis Alejandro Martínez Faneyth
-description: GitHub Action for posting to a facebook page the latest entry from an atom feed
+name: facebook-post-action
+author: ReenigneArcher
+description: GitHub Action for posting to a facebook page or group
+
+inputs:
+  page_id:
+    description: "The page/group id to post to, if not set env.FACEBOOK_PAGE_ID will be used."
+    required: false
+  access_token:
+    description: "Facebook access token, if not set env.FACEBOOK_PAGE_ID will be used."
+    required: false
+  message:
+    description: "The message content of the post."
+    required: true
+  url:
+    description: "The url to include with the post."
+    required: false
 
 runs:
-  using: docker
-  image: Dockerfile
-  args:
-    - entrypoint.py
+  using: "composite"
+  steps:
+    - run: python -m pip install -r ${{ github.action_path }}/requirements.txt  # Installing dependencies
+      shell: bash
+    - run: python ${{ github.action_path }}/facebook_post_action.py
+      shell: bash
 
 branding:
   icon: at-sign
