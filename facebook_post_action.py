@@ -8,23 +8,17 @@ from urllib.parse import urlencode
 
 from utils import s
 
-# setup the inputs
-global PAGE_ID
-global ACCESS_TOKEN
-global MESSAGE
-global URL
-
-inputs = {
-    'PAGE_ID': PAGE_ID,
-    'ACCESS_TOKEN': ACCESS_TOKEN,
-    'MESSAGE': MESSAGE,
-    'URL': URL
-}
+inputs = [
+    'ACCESS_TOKEN',
+    'MESSAGE',
+    'PAGE_ID',
+    'URL'
+]
 
 # get the input values
-for key, value in inputs.items():
+for key in inputs:
     try:
-        value = os.environ['INPUT_%s' % key] or os.environ[key]
+        globals()[key] = os.environ['INPUT_%s' % key] or os.environ[key]
     except KeyError:
         print('%s input has not been set.' % key)
         x = None
