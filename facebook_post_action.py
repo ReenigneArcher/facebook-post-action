@@ -8,20 +8,11 @@ from urllib.parse import urlencode
 
 from utils import s
 
-inputs = [
-    'ACCESS_TOKEN',
-    'MESSAGE',
-    'PAGE_ID',
-    'URL'
-]
-
-# get the input values
-for key in inputs:
-    try:
-        globals()[key] = os.environ['INPUT_%s' % key] or os.environ[key]
-    except KeyError:
-        print('%s input has not been set.' % key)
-        x = None
+# inputs
+ACCESS_TOKEN = os.environ['INPUT_ACCESS_TOKEN']
+MESSAGE = os.environ['INPUT_MESSAGE']
+PAGE_ID = os.environ['INPUT_PAGE_ID']
+URL = os.getenv('INPUT_URL', None)
 
 FACEBOOK_API_END = 'https://graph.facebook.com/{0}/feed'.format(PAGE_ID)
 
@@ -37,7 +28,6 @@ HTTP_REQUEST = Request(url=FACEBOOK_API_END,
                        data=s(urlencode(FACEBOOK_API_DATA)))
 
 while True:
-
     RESULT = json.loads(urlopen(HTTP_REQUEST).read())
 
     if 'error' not in RESULT:
