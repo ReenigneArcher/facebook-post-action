@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master, nightly]
+    types: [opened, synchronize, edited, reopened]
+  workflow_dispatch:
+
+jobs:
+  facebook_group:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: facebook-post-action
+        uses: ./
+        with:
+          page_id: ${{ secrets.FACEBOOK_GROUP_ID }}
+          access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          message: |
+            ${{ github.event.repository.name }} - ${{ github.ref_name }}
+
+            Group test successful
+          url: https://github.com/ReenigneArcher/facebook-post-action
+          fail_on_error: false
+
+  facebook_page:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: facebook-post-action
+        uses: ./
+        with:
+          page_id: ${{ secrets.FACEBOOK_PAGE_ID }}
+          access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          message: |
+            ${{ github.event.repository.name }} - ${{ github.ref_name }}
+
+            Page test successful
+          url: https://github.com/ReenigneArcher/facebook-post-action

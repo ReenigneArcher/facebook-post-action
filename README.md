@@ -1,5 +1,5 @@
 #facebook-post-action
-Github Action for posting to a facebook page or group.
+GitHub Action for posting to a facebook page or group.
 
 ## 🎒 Prep Work
 1. Get a facebook permanent access token (explained below) using a facebook account that owns the page where you want to post messages.
@@ -28,13 +28,18 @@ jobs:
 
             ${{ github.event.release.body }}
           url: ${{ github.event.release.html_url }}
+          fail_on_eror: True
 ```
 
 ## 🤫 Environment Secrets
 
-- **FACEBOOK_PAGE_ID**: The page ID where you want to post
-- **FACEBOOK_ACCESS_TOKEN**: The permanent facebook access token
-- **POST_CONTENT**: The content to post
+- **PAGE_ID**: The page ID where you want to post
+- **ACCESS_TOKEN**: The permanent facebook access token
+- **MESSAGE**: The content to post
+- **URL**: The url to embed with the post (optional)
+- **FAIL_ON_ERROR**: Fail the workflow on error.
+  Group posts will fail if the facebook app is not installed to the group; however the message will be posted,
+  setting this to False will allow the workflow run to be successful.
 
 ## 👥 How to get a Facebook permanent access token
 
@@ -48,16 +53,16 @@ I suggest using the [Graph API Explorer][3] for all of these steps except where 
 
 1. Go to [My Apps][4].
 2. Click "+ Add a New App".
-3. Setup a website app.
+3. Set up a website app.
 
-You don't need to change its permissions or anything. You just need an app that wont go away before you're done with your access token.
+You don't need to change its permissions or anything. You just need an app that won't go away before you're done with your access token.
 
 ### 1. Get User Short-Lived Access Token ###
 
 1. Go to the [Graph API Explorer][3].
 2. Select the application you want to get the access token for (in the "Facebook App" drop-down menu, not the "My Apps" menu).
 3. Click "Get Token" > "Get User Access Token".
-4. In the "Add a Permission" drop-down, search and check "manage_pages", "publish_pages" and "pages_show_list".
+4. In the "Add a Permission" drop-down, search and check "pages_manage_posts", "pages_show_list", and "publish_to_groups".
 5. Click "Generate Access Token".
 6. Grant access from a Facebook account that has access to manage the target page. Note that if this user loses access the final, never-expiring access token will likely stop working.
 
@@ -75,7 +80,9 @@ You **cannot use the Graph API Explorer**. For some reason it gets stuck on this
 
 The response should look like this:
 
-> {"access_token":"**ABC123**","token_type":"bearer","expires_in":5183791}
+```json
+{"access_token":"**ABC123**","token_type":"bearer","expires_in":5183791}
+```
 
 "ABC123" will be your long-lived access token. You can put it into the [Access Token Debugger][7] to verify. Under "Expires" it should have something like "2 months".
 
@@ -106,7 +113,7 @@ The JSON response should have a `data` field under which is an array of items th
 
 To find your Page ID:
 
-1. From News Feed, click Pages in the left side menu.
-2. Click your Page name to go to your Page.
+1. From News Feed, click Pages on the left side menu.
+2. Click your Page's name to go to your Page.
 3. Click About in the left column. If you don't see About in the left column, click See More.
 4. Scroll down to find your Page ID below More Info.

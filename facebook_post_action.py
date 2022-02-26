@@ -2,17 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import os
-import json
-from urllib.request import urlopen, Request
-from urllib.parse import urlencode
+import requests
+import sys
 
-from utils import s
+from dotenv import load_dotenv
+load_dotenv()
 
 # inputs
 ACCESS_TOKEN = os.environ['INPUT_ACCESS_TOKEN']
 MESSAGE = os.environ['INPUT_MESSAGE']
 PAGE_ID = os.environ['INPUT_PAGE_ID']
 URL = os.getenv('INPUT_URL', None)
+FAIL_ON_ERROR = os.getenv('INPUT_FAIL_ON_ERROR', 'true')
 
 FACEBOOK_API_END = 'https://graph.facebook.com/{0}/feed'.format(PAGE_ID)
 
@@ -24,12 +25,14 @@ else:
     FACEBOOK_API_DATA = {'message': MESSAGE,
                          'access_token': ACCESS_TOKEN}
 
-HTTP_REQUEST = Request(url=FACEBOOK_API_END,
-                       data=s(urlencode(FACEBOOK_API_DATA)))
+r = requests.post(url=FACEBOOK_API_END, json=FACEBOOK_API_DATA)
 
-while True:
-    RESULT = json.loads(urlopen(HTTP_REQUEST).read())
+result = r.json()
 
-    if 'error' not in RESULT:
-        print('Post successful!')
-        break
+if 'error' not in result:
+    print('Post successful')
+else:
+    print('Post error')
+    if FAIL_ON_ERROR.lower() == 'true':
+        print('Failing the workflow')
+        sys.exit(1)
