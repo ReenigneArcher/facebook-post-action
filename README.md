@@ -28,13 +28,18 @@ jobs:
 
             ${{ github.event.release.body }}
           url: ${{ github.event.release.html_url }}
+          fail_on_eror: True
 ```
 
 ## 🤫 Environment Secrets
 
-- **FACEBOOK_PAGE_ID**: The page ID where you want to post
-- **FACEBOOK_ACCESS_TOKEN**: The permanent facebook access token
-- **POST_CONTENT**: The content to post
+- **PAGE_ID**: The page ID where you want to post
+- **ACCESS_TOKEN**: The permanent facebook access token
+- **MESSAGE**: The content to post
+- **URL**: The url to embed with the post (optional)
+- **FAIL_ON_ERROR**: Fail the workflow on error.
+  Group posts will fail if the facebook app is not installed to the group; however the message will be posted,
+  setting this to False will allow the workflow run to be successful.
 
 ## 👥 How to get a Facebook permanent access token
 
@@ -57,7 +62,7 @@ You don't need to change its permissions or anything. You just need an app that 
 1. Go to the [Graph API Explorer][3].
 2. Select the application you want to get the access token for (in the "Facebook App" drop-down menu, not the "My Apps" menu).
 3. Click "Get Token" > "Get User Access Token".
-4. In the "Add a Permission" drop-down, search and check "pages_manage_posts" and "pages_show_list".
+4. In the "Add a Permission" drop-down, search and check "pages_manage_posts", "pages_show_list", and "publish_to_groups".
 5. Click "Generate Access Token".
 6. Grant access from a Facebook account that has access to manage the target page. Note that if this user loses access the final, never-expiring access token will likely stop working.
 

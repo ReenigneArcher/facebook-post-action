@@ -23,6 +23,7 @@ jobs:
 
             Group test successful
           url: https://github.com/ReenigneArcher/facebook-post-action
+          fail_on_error: false
 
   facebook_page:
     runs-on: ubuntu-latest

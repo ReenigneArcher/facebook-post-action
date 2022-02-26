@@ -15,6 +15,9 @@ inputs:
   url:
     description: "The url to include with the post."
     required: false
+  fail_on_error:
+    description: "Set to False to allow the workflow to success for groups that don't have the app installed."
+    required: false
 
 runs:
   using: "composite"
@@ -28,6 +31,7 @@ runs:
         INPUT_ACCESS_TOKEN: ${{inputs.access_token}}
         INPUT_MESSAGE: ${{inputs.message}}
         INPUT_URL: ${{inputs.url}}
+        INPUT_FAIL_ON_ERROR: ${{inputs.fail_on_error}}
 
 branding:
   icon: at-sign
