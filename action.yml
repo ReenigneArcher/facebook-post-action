@@ -23,6 +23,11 @@ runs:
       shell: bash
     - run: python ${{ github.action_path }}/facebook_post_action.py
       shell: bash
+      env:
+        INPUT_PAGE_ID: ${{inputs.page_id}}
+        INPUT_ACCESS_TOKEN: ${{inputs.access_token}}
+        INPUT_MESSAGE: ${{inputs.message}}
+        INPUT_URL: ${{inputs.url}}
 
 branding:
   icon: at-sign

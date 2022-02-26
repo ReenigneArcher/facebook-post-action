@@ -8,10 +8,6 @@ from urllib.parse import urlencode
 
 from utils import s
 
-print(os.environ)
-import sys
-sys.exit(1)
-
 # inputs
 ACCESS_TOKEN = os.environ['INPUT_ACCESS_TOKEN']
 MESSAGE = os.environ['INPUT_MESSAGE']
