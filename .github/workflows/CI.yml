@@ -19,7 +19,7 @@ jobs:
           page_id: ${{ secrets.FACEBOOK_GROUP_ID }}
           access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
           message: |
-            ${{ github.event.repository.name }} ${{ github.ref_name }}
+            ${{ github.event.repository.name }} - ${{ github.ref_name }}
 
             Group test successful
           url: https://github.com/ReenigneArcher/facebook-post-action
@@ -36,7 +36,7 @@ jobs:
           page_id: ${{ secrets.FACEBOOK_PAGE_ID }}
           access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
           message: |
-            ${{ github.event.repository.name }} ${{ github.ref_name }}
+            ${{ github.event.repository.name }} - ${{ github.ref_name }}
 
             Page test successful
           url: https://github.com/ReenigneArcher/facebook-post-action
