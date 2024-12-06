@@ -1,10 +1,9 @@
-#facebook-post-action
+# facebook-post-action
 GitHub Action for posting to a facebook page or group.
 
 ## 🎒 Prep Work
 1. Get a facebook permanent access token (explained below) using a facebook account that owns the page where you want to post messages.
-2. Find the ID of the page that you want to post messages in (explained below).
-3. Find the atom feed URL that contains the posts that you wish to share.
+2. Find the ID of the page or group that you want to post messages in (explained below).
 
 ## 🖥 Workflow example
 ```yaml
@@ -19,64 +18,71 @@ jobs:
 
     steps:
       - name: facebook-post-action
-        uses: ReenigneArcher/facebook-post-action@v1
+        uses: LizardByte/facebook-post-action@master
         with:
-          page_id: ${{ secrets.FACEBOOK_PAGE_ID }}
           access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          fail_on_eror: True
           message: |
             ${{ github.event.repository.name }} ${{ github.ref }} Released
 
             ${{ github.event.release.body }}
+          page_id: ${{ secrets.FACEBOOK_PAGE_ID }}
           url: ${{ github.event.release.html_url }}
-          fail_on_eror: True
 ```
 
-## 🤫 Environment Secrets
+## 🤫 Inputs
 
-- **PAGE_ID**: The page ID where you want to post
 - **ACCESS_TOKEN**: The permanent facebook access token
-- **MESSAGE**: The content to post
-- **URL**: The url to embed with the post (optional)
 - **FAIL_ON_ERROR**: Fail the workflow on error.
-  Group posts will fail if the facebook app is not installed to the group; however the message will be posted,
-  setting this to False will allow the workflow run to be successful.
+  Group posts will fail if the facebook app is not installed to the group; however, the message will be posted,
+  setting this to False will allow the workflow to be successful.
+- **MESSAGE**: The content to post
+- **PAGE_ID**: The page ID where you want to post
+- **URL**: The url to embed with the post (optional)
 
 ## 👥 How to get a Facebook permanent access token
 
-Following the instructions laid out in Facebook's [extending page tokens documentation][2] I was able to get a page access token that does not expire.
+Following the instructions laid out in Facebook's [extending page tokens documentation][2] I was able to get a page
+access token that does not expire.
 
 I suggest using the [Graph API Explorer][3] for all of these steps except where otherwise stated.
 
-### 0. Create Facebook App ###
+### 1. Create Facebook App
 
-**If you already have an app**, skip to step 1.
+**If you already have an app**, skip to the next step.
 
 1. Go to [My Apps][4].
 2. Click "+ Add a New App".
 3. Set up a website app.
 
-You don't need to change its permissions or anything. You just need an app that won't go away before you're done with your access token.
+You don't need to change its permissions or anything. You just need an app that won't go away before you're done with
+your access token.
 
-### 1. Get User Short-Lived Access Token ###
+### 2. Get User Short-Lived Access Token
 
 1. Go to the [Graph API Explorer][3].
-2. Select the application you want to get the access token for (in the "Facebook App" drop-down menu, not the "My Apps" menu).
-3. Click "Get Token" > "Get User Access Token".
-4. In the "Add a Permission" drop-down, search and check "pages_manage_posts", "pages_show_list", and "publish_to_groups".
-5. Click "Generate Access Token".
-6. Grant access from a Facebook account that has access to manage the target page. Note that if this user loses access the final, never-expiring access token will likely stop working.
+2. Select the application you want to get the access token for (in the "Meta App" drop-down menu).
+3. In the "Add a Permission" drop-down, search and check "pages_manage_posts", "pages_show_list",
+   and "publish_to_groups". Publishing to groups requires an approved app.
+4. Click "Generate Access Token".
+5. Grant access from a Facebook account that has access to manage the target page. Note that if this user loses access,
+   the final, never-expiring, access token will likely stop working.
 
 The token that appears in the "Access Token" field is your short-lived access token.
 
-### 2. Generate Long-Lived Access Token ###
+### 3. Generate Long-Lived Access Token
 
 Following [these instructions][5] from the Facebook docs, make a GET request to
 
-> https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=**{app_id}**&client_secret=**{app_secret}**&fb_exchange_token=**{short_lived_token}**
+```
+https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=**{app_id}**&client_secret=**{app_secret}**&fb_exchange_token=**{short_lived_token}**
+```
 
 entering in your app's ID and secret and the short-lived token generated in the previous step.
 
-You **cannot use the Graph API Explorer**. For some reason it gets stuck on this request. I think it's because the response isn't JSON, but a query string. Since it's a GET request, you can just go to the URL in your browser.
+You **cannot use the Graph API Explorer**. For some reason it gets stuck on this request.
+I think it's because the response isn't JSON, but a query string. Since it's a GET request,
+you can just go to the URL in your browser.
 
 The response should look like this:
 
@@ -84,23 +90,30 @@ The response should look like this:
 {"access_token":"**ABC123**","token_type":"bearer","expires_in":5183791}
 ```
 
-"ABC123" will be your long-lived access token. You can put it into the [Access Token Debugger][7] to verify. Under "Expires" it should have something like "2 months".
+"ABC123" will be your long-lived access token. You can put it into the [Access Token Debugger][7] to verify.
+Under "Expires" it should have something like "2 months". If it says "Never", you can skip the rest of the steps.
 
-### 3. Get User ID ###
+### 4. Get User ID
 
 Using the long-lived access token, make a GET request to
 
-> https://graph.facebook.com/me?access_token=**{long_lived_access_token}**
+```
+https://graph.facebook.com/me?access_token=**{long_lived_access_token}**
+```
 
 The `id` field is your account ID. You'll need it for the next step.
 
-### 4. Get Permanent Page Access Token ###
+### 5. Get Permanent Page Access Token
 
 Make a GET request to
 
-> https://graph.facebook.com/**{account_id}**/accounts?access_token=**{long_lived_access_token}**
+```
+https://graph.facebook.com/**{account_id}**/accounts?access_token=**{long_lived_access_token}**
+```
 
-The JSON response should have a `data` field under which is an array of items the user has access to. Find the item for the page you want the permanent access token from. The `access_token` field should have your permanent access token. Copy it and test it in the [Access Token Debugger][7]. Under "Expires" it should say "Never".
+The JSON response should have a `data` field under which is an array of items the user has access to.
+Find the item for the page you want the permanent access token from. The `access_token` field should have your
+permanent access token. Copy it and test it in the [Access Token Debugger][7]. Under "Expires" it should say "Never".
 
 [2]:https://developers.facebook.com/docs/facebook-login/access-tokens#extendingpagetokens
 [3]:https://developers.facebook.com/tools/explorer
