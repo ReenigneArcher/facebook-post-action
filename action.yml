@@ -1,6 +1,7 @@
+---
 name: facebook-post-action
-author: ReenigneArcher
-description: GitHub Action for posting to a facebook page or group
+author: LizardByte
+description: GitHub Action for posting to a facebook page or group.
 
 inputs:
   page_id:
