@@ -1,4 +1,7 @@
 # facebook-post-action
+[![GitHub Workflow Status (CI)](https://img.shields.io/github/actions/workflow/status/lizardbyte/facebook-post-action/ci.yml.svg?branch=master&label=CI%20build&logo=github&style=for-the-badge)](https://github.com/LizardByte/facebook-post-action/actions/workflows/ci.yml?query=branch%3Amaster)
+[![Codecov](https://img.shields.io/codecov/c/gh/LizardByte/facebook-post-action.svg?token=LiDWK90cNO&style=for-the-badge&logo=codecov&label=codecov)](https://app.codecov.io/gh/LizardByte/facebook-post-action)
+
 GitHub Action for posting to a facebook page or group.
 
 ## 🎒 Prep Work
@@ -128,5 +131,5 @@ To find your Page ID:
 
 1. From News Feed, click Pages on the left side menu.
 2. Click your Page's name to go to your Page.
-3. Click About in the left column. If you don't see About in the left column, click See More.
-4. Scroll down to find your Page ID below More Info.
+3. Select the About tab. If you don't see the About tab, click the More dropdown.
+4. Find your Page ID in the Page Transparency section.
