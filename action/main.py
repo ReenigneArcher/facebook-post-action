@@ -8,26 +8,24 @@ import requests
 
 load_dotenv()
 
-# inputs
-ACCESS_TOKEN = os.environ['INPUT_ACCESS_TOKEN']
-MESSAGE = os.environ['INPUT_MESSAGE']
-PAGE_ID = os.environ['INPUT_PAGE_ID']
-URL = os.getenv('INPUT_URL', None)
-FAIL_ON_ERROR = os.getenv('INPUT_FAIL_ON_ERROR', 'true')
 
-# constants
-FACEBOOK_API_END = f'https://graph.facebook.com/{PAGE_ID}/feed'
+def facebook_post(
+        access_token: str,
+        message: str,
+        page_id: str,
+        url: str = None,
+        fail_on_error: str = 'true'
+):
+    facebook_api_end = f'https://graph.facebook.com/{page_id}/feed'
 
-
-def main():
     facebook_api_data = {
-        'message': MESSAGE,
-        'access_token': ACCESS_TOKEN,
+        'message': message,
+        'access_token': access_token,
     }
-    if URL:
-        facebook_api_data['link'] = URL
+    if url:
+        facebook_api_data['link'] = url
 
-    r = requests.post(url=FACEBOOK_API_END, json=facebook_api_data)
+    r = requests.post(url=facebook_api_end, json=facebook_api_data)
 
     result = r.json()
 
@@ -36,10 +34,16 @@ def main():
     else:
         print('Post error:')
         print(result)
-        if FAIL_ON_ERROR.lower() == 'true':
+        if fail_on_error.lower() == 'true':
             print('Failing the workflow')
             sys.exit(1)
 
 
 if __name__ == '__main__':
-    main()  # pragma: no cover
+    facebook_post(
+        access_token=os.environ['INPUT_ACCESS_TOKEN'],
+        message=os.environ['INPUT_MESSAGE'],
+        page_id=os.environ['INPUT_PAGE_ID'],
+        url=os.getenv('INPUT_URL', None),
+        fail_on_error=os.getenv('INPUT_FAIL_ON_ERROR', 'true')
+    )  # pragma: no cover
