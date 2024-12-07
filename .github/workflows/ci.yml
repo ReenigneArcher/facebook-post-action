@@ -1,0 +1,60 @@
+---
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+    push:
+      branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: facebook-post-action
+        uses: ./
+        with:
+          access_token: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          fail_on_error: true
+          message: |
+            ${{ github.event.repository.name }} - ${{ github.ref_name }} test
+          page_id: ${{ secrets.FACEBOOK_PAGE_ID }}
+          url: ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}
+
+  release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs:
+      # - pytest
+      - action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Release
+        id: setup-release
+        uses: LizardByte/setup-release-action@v2024.919.143601
+        with:
+          github_token: ${{ secrets.GH_BOT_TOKEN }}
+
+      - name: Create Release
+        id: action
+        uses: LizardByte/create-release-action@v2024.919.143026
+        with:
+          allowUpdates: false
+          artifacts: ''
+          body: ${{ steps.setup-release.outputs.release_body }}
+          generateReleaseNotes: ${{ steps.setup-release.outputs.release_generate_release_notes }}
+          name: ${{ steps.setup-release.outputs.release_tag }}
+          prerelease: true
+          tag: ${{ steps.setup-release.outputs.release_tag }}
+          token: ${{ secrets.GH_BOT_TOKEN }}
